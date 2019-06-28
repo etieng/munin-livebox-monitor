@@ -1,0 +1,25 @@
+#!/bin/bash
+
+case $1 in
+   config)
+        cat <<'EOM'
+graph_title Livebox DSL bandwidth
+graph_category network
+graph_info Describe the speed rates of the livebox on the network
+graph_args --base 1000 -l 0
+graph_vlabel Downstream (-) / Upstream (+) Mbps
+down.label Stream
+up.label Bandwidth
+down.graph no
+up.negative down
+down.colour D20808
+EOM
+        exit 0;;
+esac
+
+dslrates=()
+while IFS= read -r line; do
+        dslrates+=( "$line" )
+        done < <( sysbus_munin.py -dslrate2 )
+
+printf "down.value ${dslrates[0]}\nup.value ${dslrates[1]}\n"
